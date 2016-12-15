@@ -1,0 +1,32 @@
+{
+  "name": "bin-v8-flags-filter",
+  "version": "1.0.0",
+  "description": "Filters out v8 flags for your Node.js CLIs.",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/inikulin/bin-v8-flags-filter.git"
+  },
+  "keywords": [
+    "v8",
+    "flags",
+    "bin",
+    "filter",
+    "remove",
+    "v8flags",
+    "v8-flags",
+    "cli"
+  ],
+  "author": "Ivan Nikulin (ifaaan@gmail.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/inikulin/bin-v8-flags-filter/issues"
+  },
+  "homepage": "https://github.com/inikulin/bin-v8-flags-filter#readme"
+}
