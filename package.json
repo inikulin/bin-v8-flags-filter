@@ -32,7 +32,7 @@
   },
   "homepage": "https://github.com/inikulin/bin-v8-flags-filter#readme",
   "devDependencies": {
-    "eslint": "^3.12.2",
+    "eslint": "^2.9.0",
     "mocha": "^3.2.0",
     "publish-please": "^2.2.0"
   }

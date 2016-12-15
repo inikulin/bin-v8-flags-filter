@@ -3,7 +3,8 @@
 
 *Filters out v8 flags for your Node.js CLIs.*
 
-TODO
+Filters out well-known v8 flags given to your CLI and spawns new process with v8 flags passed to Node.js and the rest
+of the args to your actual CLI.
 
 ## Install
 ```
@@ -11,8 +12,14 @@ npm install bin-v8-flags-filter
 ```
 
 ## Usage
+*In JS file specified as `bin` in your `package.json`:*
 ```js
-TODO
+const v8FlagsFilter = require('bin-v8-flags-filter');
+const path = require('path');
+
+const cliPath = path.join(__dirname, './cli.js'); // Path to your actual CLI file that contains app code.
+
+v8FlagsFilter(cliPath);
 ```
 
 ## Author
