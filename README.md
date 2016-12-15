@@ -3,8 +3,8 @@
 
 *Filters out v8 flags for your Node.js CLIs.*
 
-Filters out well-known v8 flags given to your CLI and spawns new process with v8 flags passed to Node.js and the rest
-of the args to your actual CLI.
+Filters out well-known v8 flags given to your app and spawns new process with v8 flags passed to Node.js and the rest
+of the args passed to your actual CLI.
 
 ## Install
 ```
