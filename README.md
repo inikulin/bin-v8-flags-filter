@@ -4,7 +4,7 @@
 *Filters out v8 flags for your Node.js CLIs.*
 
 Filters out well-known v8 flags given to your app and spawns new process with v8 flags passed to Node.js and the rest
-of the args passed to your actual CLI.
+of the args passed to your actual CLI. Basically an extraction of related [mocha code](https://github.com/mochajs/mocha/blob/master/bin/mocha).
 
 ## Install
 ```
