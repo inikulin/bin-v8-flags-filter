@@ -7,7 +7,9 @@
     "test": "test"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "eslint index.js test/test.js && mocha test/test.js",
+    "publish-please": "publish-please",
+    "prepublish": "publish-please guard"
   },
   "repository": {
     "type": "git",
@@ -28,5 +30,10 @@
   "bugs": {
     "url": "https://github.com/inikulin/bin-v8-flags-filter/issues"
   },
-  "homepage": "https://github.com/inikulin/bin-v8-flags-filter#readme"
+  "homepage": "https://github.com/inikulin/bin-v8-flags-filter#readme",
+  "devDependencies": {
+    "eslint": "^3.12.2",
+    "mocha": "^3.2.0",
+    "publish-please": "^2.2.0"
+  }
 }
