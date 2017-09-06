@@ -26,8 +26,11 @@ var FLAG_PREFIXES = [
     '--preserve-symlinks'
 ];
 
-module.exports = function (cliPath) {
-    var args = [cliPath];
+var SIGTERM_TIMEOUT = 30000;
+
+module.exports = function (cliPath, opts) {
+    var useShutdownMessage = opts && opts.useShutdownMessage;
+    var args               = [cliPath];
 
     process.argv.slice(2).forEach(function (arg) {
         var flag = arg.split('=')[0];
@@ -47,9 +50,12 @@ module.exports = function (cliPath) {
         args.push(arg);
     });
 
-    var cliProc = spawn(process.execPath, args, { stdio: 'inherit' });
+    var cliProc = spawn(process.execPath, args, { stdio: [process.stdin, process.stdout, process.stderr, useShutdownMessage ? 'ipc' : null] });
 
     cliProc.on('exit', function (code, signal) {
+        if (useShutdownMessage)
+            process.disconnect();
+
         process.on('exit', function () {
             if (signal)
                 process.kill(process.pid, signal);
@@ -60,7 +66,20 @@ module.exports = function (cliPath) {
     });
 
     process.on('SIGINT', function () {
-        cliProc.kill('SIGINT');
-        cliProc.kill('SIGTERM');
+        if (useShutdownMessage)
+            cliProc.send('shutdown');
+        else
+            cliProc.kill('SIGINT');
+        
+        setTimeout(function () {
+            cliProc.kill('SIGTERM');
+        }, SIGTERM_TIMEOUT);
     });
+
+    if (useShutdownMessage) {
+        process.on('message', function (message) {
+            if (message === 'shutdown')
+                cliProc.send('shutdown');
+        });
+    }
 };

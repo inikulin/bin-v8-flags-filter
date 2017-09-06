@@ -1,5 +1,7 @@
 var path   = require('path');
 var filter = require('../');
 
-filter(path.join(__dirname, './actual-cli.js'));
+var gracefulShutdown = process.argv.indexOf('--graceful-shutdown') > -1;
+
+filter(path.join(__dirname, './actual-cli.js'), { useShutdownMessage: gracefulShutdown });
 
