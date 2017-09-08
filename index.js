@@ -26,8 +26,12 @@ var FLAG_PREFIXES = [
     '--preserve-symlinks'
 ];
 
-module.exports = function (cliPath) {
-    var args = [cliPath];
+var DEFAULT_FORCED_KILL_DELAY = 30000;
+
+module.exports = function (cliPath, opts) {
+    var useShutdownMessage = opts && opts.useShutdownMessage;
+    var forcedKillDelay    = opts && opts.forcedKillDelay || DEFAULT_FORCED_KILL_DELAY;
+    var args               = [cliPath];
 
     process.argv.slice(2).forEach(function (arg) {
         var flag = arg.split('=')[0];
@@ -47,20 +51,35 @@ module.exports = function (cliPath) {
         args.push(arg);
     });
 
-    var cliProc = spawn(process.execPath, args, { stdio: 'inherit' });
+    var cliProc = spawn(process.execPath, args, { stdio: [process.stdin, process.stdout, process.stderr, useShutdownMessage ? 'ipc' : null] });
 
     cliProc.on('exit', function (code, signal) {
+        if (useShutdownMessage)
+            process.disconnect();
+
         process.on('exit', function () {
             if (signal)
                 process.kill(process.pid, signal);
-
             else
                 process.exit(code);
         });
     });
 
     process.on('SIGINT', function () {
-        cliProc.kill('SIGINT');
-        cliProc.kill('SIGTERM');
+        if (useShutdownMessage)
+            cliProc.send('shutdown');
+        else
+            cliProc.kill('SIGINT');
+
+        setTimeout(function () {
+            cliProc.kill('SIGTERM');
+        }, forcedKillDelay);
     });
+
+    if (useShutdownMessage) {
+        process.on('message', function (message) {
+            if (message === 'shutdown')
+                cliProc.send('shutdown');
+        });
+    }
 };
