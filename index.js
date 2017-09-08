@@ -26,10 +26,11 @@ var FLAG_PREFIXES = [
     '--preserve-symlinks'
 ];
 
-var SIGTERM_TIMEOUT = 30000;
+var DEFAULT_FORCED_KILL_DELAY = 30000;
 
 module.exports = function (cliPath, opts) {
     var useShutdownMessage = opts && opts.useShutdownMessage;
+    var forcedKillDelay    = opts && opts.forcedKillDelay || DEFAULT_FORCED_KILL_DELAY;
     var args               = [cliPath];
 
     process.argv.slice(2).forEach(function (arg) {
@@ -59,7 +60,6 @@ module.exports = function (cliPath, opts) {
         process.on('exit', function () {
             if (signal)
                 process.kill(process.pid, signal);
-
             else
                 process.exit(code);
         });
@@ -70,10 +70,10 @@ module.exports = function (cliPath, opts) {
             cliProc.send('shutdown');
         else
             cliProc.kill('SIGINT');
-        
+
         setTimeout(function () {
             cliProc.kill('SIGTERM');
-        }, SIGTERM_TIMEOUT);
+        }, forcedKillDelay);
     });
 
     if (useShutdownMessage) {
