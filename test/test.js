@@ -47,3 +47,29 @@ it('Should use shutdown message', function (done) {
 
     cliProcess.send('shutdown');
 });
+
+it('[Regression] Should not abort if using shutdown message and no parent IPC was established', function (done) {
+    var args = [
+        path.join(__dirname, './cli.js'),
+        '--hey',
+        '--allow-natives-syntax',
+        '-t=yo',
+        '--trace-gc',
+        '--no-ipc-test'
+    ];
+
+    var output     = '';
+    var cliProcess = spawn(process.execPath, args, { stdio: 'pipe' });
+
+    cliProcess.stdout.on('data', function (data) {
+        output += data.toString();
+    });
+
+    cliProcess.on('exit', function (code) {
+        assert.equal(code, 0);
+        assert.ok(output.indexOf('$$$ARGS:["--hey","-t=yo","--no-ipc-test"]$$$') > -1);
+        assert.ok(output.indexOf('$$$ISSMI:true$$$') > -1);
+
+        done();
+    });
+});

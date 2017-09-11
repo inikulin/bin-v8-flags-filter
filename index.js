@@ -54,7 +54,7 @@ module.exports = function (cliPath, opts) {
     var cliProc = spawn(process.execPath, args, { stdio: [process.stdin, process.stdout, process.stderr, useShutdownMessage ? 'ipc' : null] });
 
     cliProc.on('exit', function (code, signal) {
-        if (useShutdownMessage)
+        if (useShutdownMessage && process.disconnect)
             process.disconnect();
 
         process.on('exit', function () {
@@ -66,14 +66,16 @@ module.exports = function (cliPath, opts) {
     });
 
     process.on('SIGINT', function () {
+        function forceKill () {
+            cliProc.kill('SIGTERM');
+        }
+
         if (useShutdownMessage)
             cliProc.send('shutdown');
         else
             cliProc.kill('SIGINT');
 
-        setTimeout(function () {
-            cliProc.kill('SIGTERM');
-        }, forcedKillDelay);
+        setTimeout(forceKill, forcedKillDelay).unref();
     });
 
     if (useShutdownMessage) {
