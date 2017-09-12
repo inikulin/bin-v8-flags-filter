@@ -28,10 +28,8 @@ var FLAG_PREFIXES = [
 
 var DEFAULT_FORCED_KILL_DELAY = 30000;
 
-module.exports = function (cliPath, opts) {
-    var useShutdownMessage = opts && opts.useShutdownMessage;
-    var forcedKillDelay    = opts && opts.forcedKillDelay || DEFAULT_FORCED_KILL_DELAY;
-    var args               = [cliPath];
+function getChildArgs (cliPath) {
+    var args = [cliPath];
 
     process.argv.slice(2).forEach(function (arg) {
         var flag = arg.split('=')[0];
@@ -51,6 +49,31 @@ module.exports = function (cliPath, opts) {
         args.push(arg);
     });
 
+    return args;
+}
+
+function setupSignalHandler (signal, childProcess, useShutdownMessage, forcedKillDelay) {
+    function forceKill () {
+        childProcess.kill('SIGTERM');
+    }
+
+    function handler () {
+        if (useShutdownMessage)
+            childProcess.send('shutdown');
+        else
+            childProcess.kill(signal);
+
+        setTimeout(forceKill, forcedKillDelay).unref();
+    }
+
+    process.on(signal, handler);
+}
+
+module.exports = function (cliPath, opts) {
+    var useShutdownMessage = opts && opts.useShutdownMessage;
+    var forcedKillDelay    = opts && opts.forcedKillDelay || DEFAULT_FORCED_KILL_DELAY;
+    var args               = getChildArgs(cliPath);
+
     var cliProc = spawn(process.execPath, args, { stdio: [process.stdin, process.stdout, process.stderr, useShutdownMessage ? 'ipc' : null] });
 
     cliProc.on('exit', function (code, signal) {
@@ -65,18 +88,8 @@ module.exports = function (cliPath, opts) {
         });
     });
 
-    process.on('SIGINT', function () {
-        function forceKill () {
-            cliProc.kill('SIGTERM');
-        }
-
-        if (useShutdownMessage)
-            cliProc.send('shutdown');
-        else
-            cliProc.kill('SIGINT');
-
-        setTimeout(forceKill, forcedKillDelay).unref();
-    });
+    setupSignalHandler('SIGINT', cliProc, useShutdownMessage, forcedKillDelay);
+    setupSignalHandler('SIGBREAK', cliProc, useShutdownMessage, forcedKillDelay);
 
     if (useShutdownMessage) {
         process.on('message', function (message) {
