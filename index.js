@@ -5,6 +5,7 @@ var FLAGS = [
     '--debug',
     '--debug-brk',
     '--inspect',
+    '--inspect-brk',
     '--expose-gc',
     '--gc-global',
     '--es_staging',
