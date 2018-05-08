@@ -29,11 +29,16 @@ var FLAG_PREFIXES = [
 
 var DEFAULT_FORCED_KILL_DELAY = 30000;
 
-function getChildArgs (cliPath) {
+function getChildArgs (cliPath, ignore) {
     var args = [cliPath];
 
     process.argv.slice(2).forEach(function (arg) {
         var flag = arg.split('=')[0];
+
+        if (ignore.indexOf(flag) > -1) {
+            args.push(arg);
+            return;
+        }
 
         if (FLAGS.indexOf(flag) > -1) {
             args.unshift(arg);
@@ -73,7 +78,8 @@ function setupSignalHandler (signal, childProcess, useShutdownMessage, forcedKil
 module.exports = function (cliPath, opts) {
     var useShutdownMessage = opts && opts.useShutdownMessage;
     var forcedKillDelay    = opts && opts.forcedKillDelay || DEFAULT_FORCED_KILL_DELAY;
-    var args               = getChildArgs(cliPath);
+    var ignore             = opts && opts.ignore || [];
+    var args               = getChildArgs(cliPath, ignore);
 
     var cliProc = spawn(process.execPath, args, { stdio: [process.stdin, process.stdout, process.stderr, useShutdownMessage ? 'ipc' : null] });
 

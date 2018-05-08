@@ -20,6 +20,24 @@ it('Should filter v8 flags', function (done) {
     });
 });
 
+it('Should use ignore option to not filter some v8 flags', function (done) {
+    var args = [
+        path.join(__dirname, './cli.js'),
+        '--hey',
+        '--allow-natives-syntax',
+        '-t=yo',
+        '--trace-gc',
+        '--ignore-trace-gc'
+    ];
+
+    execFile(process.execPath, args, function (err, stdout) {
+        assert.ok(stdout.indexOf('$$$ARGS:["--hey","-t=yo","--trace-gc","--ignore-trace-gc"]$$$') > -1);
+        assert.ok(stdout.indexOf('$$$ISSMI:true$$$') > -1);
+
+        done();
+    });
+});
+
 it('Should use shutdown message', function (done) {
     var args = [
         path.join(__dirname, './cli.js'),
