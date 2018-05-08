@@ -16,7 +16,8 @@ var FLAGS = [
     '--trace-deprecation',
     '--use_strict',
     '--allow-natives-syntax',
-    '--perf-basic-prof'
+    '--perf-basic-prof',
+    '--experimental-repl-await'
 ];
 
 var FLAG_PREFIXES = [
