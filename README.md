@@ -22,5 +22,13 @@ const cliPath = path.join(__dirname, './cli.js'); // Path to your actual CLI fil
 v8FlagsFilter(cliPath);
 ```
 
+### API
+#### `v8FlagsFilter(path, [options])`
+ - `path` - path to CLI script.
+ - `options` - an optional object with the following optional keys:
+   - `ignore` - an array of v8 flags to ignore, i.e. to _not_ filter-out when spawning a new process.
+   - `forcedKillDelay` - a number of milliseconds after which to send a kill command to the spawned process, only after an interrupt has already been issued.  Defaults to `30000`.
+   - `useShutdownMessage` - rather than forwarding along interrupt signals to the spawned process, instead forwards a `'shutdown'` message to the spawned process.
+
 ## Author
 [Ivan Nikulin](https://github.com/inikulin) (ifaaan@gmail.com)
