@@ -17,7 +17,9 @@ var FLAGS = [
     '--use_strict',
     '--allow-natives-syntax',
     '--perf-basic-prof',
-    '--experimental-repl-await'
+    '--experimental-repl-await',
+    '--experimental-loader',
+    '--no-warnings'
 ];
 
 var FLAG_PREFIXES = [
@@ -81,6 +83,9 @@ module.exports = function (cliPath, opts) {
     var forcedKillDelay    = opts && opts.forcedKillDelay || DEFAULT_FORCED_KILL_DELAY;
     var ignore             = opts && opts.ignore || [];
     var args               = getChildArgs(cliPath, ignore);
+    
+    if (opts.forcedArgs && opts.forcedArgs.length > 0)
+        args.unshift(...opts.forcedArgs);
 
     var cliProc = spawn(process.execPath, args, { stdio: [process.stdin, process.stdout, process.stderr, useShutdownMessage ? 'ipc' : null] });
 
